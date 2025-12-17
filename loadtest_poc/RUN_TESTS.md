@@ -27,7 +27,24 @@ k6 run k6-tests/smoke-test.js
 
 ---
 
-### Option 2: Production Load Test (Full - 43 minutes)
+### Option 2: Quick Test (75 seconds)
+**Purpose:** Quick load test with ramping VUs
+
+```bash
+cd loadtest_poc
+k6 run k6-tests/quick-test.js
+```
+
+**What you'll see:**
+- Test configuration with ramping stages
+- Health check
+- Progress every 25 requests
+- Metrics for latency, CPU, and I/O
+- Final summary with thresholds
+
+---
+
+### Option 3: Production Load Test (3 minutes)
 **Purpose:** Simulate 350k DAU production traffic
 
 ```bash
@@ -49,7 +66,7 @@ k6 run k6-tests/load-test.js
 
 ---
 
-### Option 3: Test Remote Deployment
+### Option 4: Test Remote Deployment
 
 **ECS + EC2:**
 ```bash
@@ -129,20 +146,28 @@ checks.........................: 100.00%  12500 out of 12500
 **For 350k DAU:**
 - Peak concurrent users: ~14,500 (4% of DAU at peak hour)
 - Test simulates: Up to 500 VUs
-- Duration: 43 minutes
+- Duration: ~3 minutes (COMPRESSED)
 - Stages:
-  1. Warmup (2m): 10 → 50 VUs
-  2. Morning ramp (6m): 50 → 200 VUs
-  3. Peak ramp (15m): 200 → 500 VUs
-  4. Sustained peak (10m): 500 VUs
-  5. Decline (6m): 500 → 150 VUs
-  6. Cooldown (2m): 150 → 0 VUs
+  1. Warmup (10s): 10 → 50 VUs
+  2. Morning ramp (15s): 50 → 100 VUs
+  3. Traffic increase (15s): 100 → 200 VUs
+  4. Pre-peak (20s): 200 → 300 VUs
+  5. Peak ramp (20s): 300 → 400 VUs
+  6. Maximum load (20s): 400 → 500 VUs
+  7. Sustained peak (30s): 500 VUs
+  8. Evening decline (15s): 500 → 300 VUs
+  9. Wind down (15s): 300 → 150 VUs
+  10. Cooldown (10s): 150 → 0 VUs
 
 **Performance Thresholds:**
 - ✅ P50 < 2000ms
+- ✅ P90 < 3000ms
 - ✅ P95 < 5000ms
+- ✅ P99 < 8000ms
 - ✅ Error rate < 1%
-- ✅ Throughput > 50 req/s
+- ✅ Throughput > 20 req/s
+- ✅ Throttled requests < 100
+- ✅ Server errors < 50
 
 ---
 

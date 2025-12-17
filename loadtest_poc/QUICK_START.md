@@ -56,7 +56,57 @@ checks.........................: 100.00%     ← Success rate
 
 ---
 
-## 🔥 Option 2: PRODUCTION LOAD TEST (43 minutes - 350k DAU Scale!)
+## 🔥 Option 2: QUICK TEST (75 seconds - Ramping Load!)
+
+```bash
+cd loadtest_poc
+k6 run k6-tests/quick-test.js
+```
+
+**You'll see:**
+```
+╭────────────────────────────────────────────────────────────────╮
+│         🚀 K6 QUICK LOAD TEST - 2 MINUTES                    │
+╰────────────────────────────────────────────────────────────────╯
+
+📍 Target: http://localhost:8000/heavy/cpu-io-no-db/
+⏱️  Duration: 75 seconds
+👥 Max VUs: 20
+
+📈 Stages:
+   1. Ramp up (15s): 10 → 20 VUs
+   2. Peak load (30s): 20 → 20 VUs
+   3. Ramp down (30s): 20 → 0 VUs
+
+🎯 Thresholds:
+   • P95 Latency: < 5000ms
+   • Error Rate: < 1%
+   • Request Rate: > 20 req/s
+
+🏥 Health check...
+✅ Server ready!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏁 Starting test...
+
+📊 [#25] VUs: 20 | Response: 1234ms | CPU: 1.19s
+📊 [#50] VUs: 20 | Response: 1256ms | CPU: 1.21s
+...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏁 Test Complete!
+
+FINAL METRICS:
+custom_cpu_time_ms.............: avg=1190ms  p(95)=1300ms
+custom_io_time_ms..............: avg=10ms    p(95)=20ms
+latency_total_ms...............: avg=1234ms  p(95)=3200ms
+http_req_failed................: 0.00%
+http_reqs......................: 60 (25/s)
+```
+
+---
+
+## 🔥 Option 3: PRODUCTION LOAD TEST (3 minutes - 350k DAU Scale!)
 
 ```bash
 cd loadtest_poc
@@ -73,7 +123,7 @@ k6 run k6-tests/load-test.js
 👥 Production Scale: 350,000 Daily Active Users
 ⚡ Peak Concurrent: ~14,500 users (4% of DAU)
 🧪 Test Scale: Up to 500 Virtual Users
-⏱️  Total Duration: ~43 minutes
+⏱️  Total Duration: ~3 minutes (COMPRESSED)
 
 📊 API Load Parameters:
    • Prime Limit: 500,000
@@ -82,23 +132,23 @@ k6 run k6-tests/load-test.js
    • Expected Response Time: ~1.2s per request
 
 📈 Load Test Stages (Production Traffic Pattern):
-    1. Warmup (10→50)                → 50 VUs (2m)
-    2. Morning Ramp (50→100)         → 100 VUs (3m)
-    3. Traffic Increase (100→200)    → 200 VUs (3m)
-    4. Pre-Peak (200→300)            → 300 VUs (5m)
-    5. Peak Ramp (300→400)           → 400 VUs (5m)
-    6. Maximum Load (400→500)        → 500 VUs (5m)
-    7. Sustained Peak (500 VUs)      → 500 VUs (10m)
-    8. Evening Decline (500→300)     → 300 VUs (3m)
-    9. Wind Down (300→150)           → 150 VUs (3m)
-   10. Cooldown (150→0)              → 0 VUs (2m)
+    1. Warmup (10→50)                → 50 VUs (10s)
+    2. Morning Ramp (50→100)         → 100 VUs (15s)
+    3. Traffic Increase (100→200)    → 200 VUs (15s)
+    4. Pre-Peak (200→300)            → 300 VUs (20s)
+    5. Peak Ramp (300→400)           → 400 VUs (20s)
+    6. Maximum Load (400→500)        → 500 VUs (20s)
+    7. Sustained Peak (500 VUs)      → 500 VUs (30s)
+    8. Evening Decline (500→300)     → 300 VUs (15s)
+    9. Wind Down (300→150)           → 150 VUs (15s)
+   10. Cooldown (150→0)              → 0 VUs (10s)
 
 🎯 Production Performance Thresholds:
    • P50 Latency: < 2000ms
    • P90 Latency: < 3000ms
    • P95 Latency: < 5000ms
    • P99 Latency: < 8000ms
-   • Request Rate: > 50 req/s
+   • Request Rate: > 20 req/s
    • Error Rate: < 1%
    • Throttled Requests: < 100
    • Server Errors: < 50
@@ -124,7 +174,7 @@ k6 run k6-tests/load-test.js
    • CPU Time: 1.21s | I/O Time: 0.02s
    • Primes Found: 41538
 
-... continues for 43 minutes ...
+... continues for 3 minutes ...
 
 🏁 Load Test Completed!
 
@@ -152,9 +202,13 @@ checks.........................: 99.50%      ← 99.5% success rate
 
 THRESHOLDS:
 ✓ latency_total_ms..............: p(50)<2000ms ✅
+✓ latency_total_ms..............: p(90)<3000ms ✅
 ✓ latency_total_ms..............: p(95)<5000ms ✅
+✓ latency_total_ms..............: p(99)<8000ms ✅
 ✓ http_req_failed...............: rate<0.01 ✅
-✓ http_reqs.....................: rate>50 ✅
+✓ http_reqs.....................: rate>20 ✅
+✓ throttled_requests............: count<100 ✅
+✓ server_errors.................: count<50 ✅
 ```
 
 ---

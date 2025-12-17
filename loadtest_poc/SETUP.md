@@ -83,7 +83,15 @@ Quick validation test with 10 virtual users:
 k6 run k6-tests/smoke-test.js
 ```
 
-### Production Load Test (43 minutes)
+### Quick Test (75 seconds)
+
+Ramping load test with up to 20 virtual users:
+
+```bash
+k6 run k6-tests/quick-test.js
+```
+
+### Production Load Test (3 minutes)
 
 Full production-scale test simulating 350k DAU:
 
@@ -210,8 +218,9 @@ loadtest_poc/
 ├── loadtest_project/          # Django project settings
 ├── heavy_api/                 # Heavy computation API
 ├── k6-tests/                  # Load testing scripts
-│   ├── load-test.js          # Full production test
-│   └── smoke-test.js         # Quick validation test
+│   ├── smoke-test.js         # Quick validation test (30 sec)
+│   ├── quick-test.js         # Quick load test (75 sec)
+│   └── load-test.js          # Production test (3 min)
 ├── Dockerfile                 # Production Docker image
 ├── docker-compose.yml         # Local Docker setup
 ├── push-to-ecr.sh            # ECR deployment script

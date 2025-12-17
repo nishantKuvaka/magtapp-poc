@@ -118,7 +118,12 @@ choco install k6
 k6 run k6-tests/smoke-test.js
 ```
 
-**Full Load Test** (10 minutes, ramping 1→150 VUs):
+**Quick Test** (75 seconds, ramping 10→20 VUs):
+```bash
+k6 run k6-tests/quick-test.js
+```
+
+**Production Load Test** (3 minutes, ramping up to 500 VUs):
 ```bash
 k6 run k6-tests/load-test.js
 ```
@@ -130,21 +135,39 @@ k6 run k6-tests/load-test.js -e BASE_URL=http://your-server:8000
 
 ### Test Stages
 
-The full load test ramps through these stages:
-1. **Warmup** (1m): 1 → 5 VUs
-2. **Ramp to 20** (2m): 5 → 20 VUs
-3. **Ramp to 50** (2m): 20 → 50 VUs
-4. **Ramp to 100** (2m): 50 → 100 VUs
-5. **Peak Load** (2m): 100 → 150 VUs
-6. **Cooldown** (1m): 150 → 0 VUs
+**Quick Test** (75 seconds):
+1. **Ramp up** (15s): 10 → 20 VUs
+2. **Peak load** (30s): 20 VUs
+3. **Ramp down** (30s): 20 → 0 VUs
+
+**Production Load Test** (3 minutes):
+1. **Warmup** (10s): 10 → 50 VUs
+2. **Morning ramp** (15s): 50 → 100 VUs
+3. **Traffic increase** (15s): 100 → 200 VUs
+4. **Pre-peak** (20s): 200 → 300 VUs
+5. **Peak ramp** (20s): 300 → 400 VUs
+6. **Maximum load** (20s): 400 → 500 VUs
+7. **Sustained peak** (30s): 500 VUs
+8. **Evening decline** (15s): 500 → 300 VUs
+9. **Wind down** (15s): 300 → 150 VUs
+10. **Cooldown** (10s): 150 → 0 VUs
 
 ### Performance Thresholds
 
-- **P50 Latency:** < 1000ms
-- **P95 Latency:** < 3000ms
-- **P99 Latency:** < 6000ms
-- **Throttled Requests:** < 50
-- **Server Errors:** < 10
+**Quick Test:**
+- **P95 Latency:** < 5000ms
+- **Error Rate:** < 1%
+- **Request Rate:** > 20 req/s
+
+**Production Load Test:**
+- **P50 Latency:** < 2000ms
+- **P90 Latency:** < 3000ms
+- **P95 Latency:** < 5000ms
+- **P99 Latency:** < 8000ms
+- **Error Rate:** < 1%
+- **Request Rate:** > 20 req/s
+- **Throttled Requests:** < 100
+- **Server Errors:** < 50
 
 ## 🐳 AWS ECR & ECS Deployment
 
@@ -271,8 +294,9 @@ loadtest_poc/
 │   ├── urls.py
 │   └── views.py              # API endpoints
 ├── k6-tests/                  # Load testing scripts
-│   ├── load-test.js          # Full load test (43 min)
-│   └── smoke-test.js         # Quick smoke test (30 sec)
+│   ├── smoke-test.js         # Quick smoke test (30 sec)
+│   ├── quick-test.js         # Quick load test (75 sec)
+│   └── load-test.js          # Production load test (3 min)
 ├── Dockerfile                 # Production Docker image
 ├── docker-compose.yml         # Local Docker setup
 ├── push-to-ecr.sh            # ECR deployment script
