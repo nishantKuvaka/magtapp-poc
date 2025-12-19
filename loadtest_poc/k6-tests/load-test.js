@@ -134,9 +134,13 @@ export function setup() {
 }
 
 export default function () {
+    // const url =
+    //     `${BASE_URL}/heavy/cpu-io-no-db/` +
+    //     `?prime_limit=500000&hash_rounds=1000000&io_kb=128`;
+
     const url =
         `${BASE_URL}/heavy/cpu-io-no-db/` +
-        `?prime_limit=500000&hash_rounds=1000000&io_kb=128`;
+        `?prime_limit=100000&hash_rounds=10000&io_kb=64`;
 
     const res = http.get(url, { timeout: '120s' });
 
